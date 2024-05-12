@@ -10,8 +10,28 @@ namespace Assignment_2_loan_system
     {
         //Class designed to log customer details
         public string Name { get; set; }
-        public string Address { get; set; }
-        public string PhoneNumber { get; set; }
+        public string ContactDetails { get; set; }
+
+        public Customer(string name, string contactDetails = "")
+        {
+            this.Name = name;
+            this.ContactDetails = contactDetails;
+        }
+
+        public void UpdateName(string newName)
+        {
+            Name = newName;
+        }
+
+        public void UpdateContactDetails(string newContactDetails)
+        {
+            ContactDetails = newContactDetails;
+        }
+
+        public override string ToString()
+        {
+            return $"Name: {Name}, Contact Details: {ContactDetails}";
+        }
 
     }
 }

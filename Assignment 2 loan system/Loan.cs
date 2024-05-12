@@ -14,5 +14,23 @@ namespace Assignment_2_loan_system
         public DateTime LoanDate { get; set; }
         public DateTime ReturnDate { get; set; }
 
+        public Loan(Customer customer, Equipment equipment, DateTime loanDate, DateTime returnDate)
+        {
+            this.Customer = customer;
+            this.Equipment = equipment;
+            this.LoanDate = loanDate;
+            this.ReturnDate = returnDate;
+        }
+
+        public void UpdateReturnDate(DateTime newReturnDate)
+        {
+            ReturnDate = newReturnDate;
+        }
+
+        public override string ToString()
+        {
+            return $"Customer: {Customer.Name}, Equipment: {Equipment.Name}, Loan Date: {LoanDate}, Return Date: {ReturnDate}";
+        }
+
     }
 }
