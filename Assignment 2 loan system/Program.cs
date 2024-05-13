@@ -83,19 +83,110 @@ namespace Application
         static void FindAndUpdateLoans(LoanManagement loanManagement)
         {
             //Search function
-            Console.WriteLine("Not implemented");
+            Console.WriteLine("Find and Update Loans");
+
+            // Get search criteria from user
+            Console.Write("Enter search query (customer name, equipment name, or loan date): ");
+            string searchQuery = Console.ReadLine();
+
+            // Find loans based on search query
+            List<Loan> foundLoans = loanManagement.FindLoan(searchQuery);
+
+            // Display search results
+            if (foundLoans.Count > 0)
+            {
+                Console.WriteLine("Found Loans:");
+                for (int i = 0; i < foundLoans.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {foundLoans[i]}");
+                }
+
+                // Prompt user to select a loan to update
+                Console.Write("Enter the number of the loan you want to update (or 0 to cancel): ");
+                int selectedIndex = Convert.ToInt32(Console.ReadLine());
+
+                if (selectedIndex > 0 && selectedIndex <= foundLoans.Count)
+                {
+                    // Update selected loan
+                    Loan selectedLoan = foundLoans[selectedIndex - 1];
+                    Console.Write("Enter new return date (YYYY-MM-DD): ");
+                    string newReturnDateString = Console.ReadLine();
+                    if (DateTime.TryParse(newReturnDateString, out DateTime newReturnDate))
+                    {
+                        loanManagement.UpdateLoan(selectedLoan, newReturnDate);
+                        Console.WriteLine("Loan updated successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid date format. Loan update cancelled.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid selection. Loan update cancelled.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No loans found matching the search criteria.");
+            }
         }
 
         static void FilterCustomersAndEquipment(LoanManagement loanManagement)
         {
             //Filter items/customer function
-            Console.WriteLine("Not implemented");
+            Console.WriteLine("Filter Customers and Equipment");
+
+            // Get filter criteria from user
+            Console.Write("Enter name to filter by: ");
+            string nameFilter = Console.ReadLine();
+
+            // Filter customers
+            List<Customer> filteredCustomers = loanManagement.FilterCustomers(nameFilter);
+
+            // Display filtered customers
+            Console.WriteLine("Filtered Customers:");
+            foreach (Customer customer in filteredCustomers)
+            {
+                Console.WriteLine(customer);
+            }
+
+            // Filter equipment
+            List<Equipment> filteredEquipment = loanManagement.FilterEquipment(nameFilter);
+
+            // Display filtered equipment
+            Console.WriteLine("Filtered Equipment:");
+            foreach (Equipment equipment in filteredEquipment)
+            {
+                Console.WriteLine(equipment);
+            }
         }
 
         static void ViewOverdueItemsAndFines(LoanManagement loanManagement)
         {
             //Overdue loans and fines function
-            Console.WriteLine("Not implemented");
+            Console.WriteLine("View Overdue Items and Fines");
+
+            // Get overdue loans from loan management
+            List<Loan> overdueLoans = loanManagement.GenerateOverdueReport();
+
+            // Check if there are any overdue loans
+            if (overdueLoans.Count > 0)
+            {
+                Console.WriteLine("Overdue Items:");
+                foreach (Loan loan in overdueLoans)
+                {
+                    // Calculate fine for the overdue loan
+                    decimal fine = loanManagement.CalculateFine(loan);
+
+                    // Display overdue loan details and fine
+                    Console.WriteLine($"Customer: {loan.Customer.Name}, Equipment: {loan.Equipment.Name}, Return Date: {loan.ReturnDate}, Fine: £{fine}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No overdue items found.");
+            }
         }
     }
 }
