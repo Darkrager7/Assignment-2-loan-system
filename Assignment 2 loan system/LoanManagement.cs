@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,39 +12,53 @@ namespace Assignment_2_loan_system
     {
         public List<Loan> loans = new List<Loan>();
         public List<Customer> customers = new List<Customer>();
-        public List<Equipment> equipment = new List<Equipment>();
+        public List<Equipment> availableEquipment = new List<Equipment>(); //List of available equipment
 
-        public void CreateLoan(Customer customer, Equipment equipment, DateTime loanDate, int loanDuration)
+        public List<Equipment> AvailableEquipment => availableEquipment;
+
+        public LoanManagement(List<Equipment> initialEquipment)
         {
-            //Function designed to initialise a loan based on whether or not the asked equipment is available.
-            if(equipment.IsAvailable)
+            availableEquipment.AddRange(initialEquipment); //Initialising list of available equipment
+        }
+
+        public void CreateLoan(Customer customer, string equipmentName, DateTime loanDate, int loanDuration)
+        {
+            //Find the equipment in the list of available equipment
+            Equipment foundEquipment = availableEquipment.FirstOrDefault(e => e.Name.Equals(equipmentName, StringComparison.OrdinalIgnoreCase));
+
+            if (foundEquipment != null && foundEquipment.IsAvailable)
             {
+                //Calculate return date based on the loan duration
                 DateTime returnDate = loanDate.AddDays(loanDuration);
 
-                Loan newLoan = new Loan(customer, equipment, loanDate, returnDate);
-                
-                equipment.IsAvailable = false;
+                //Create a new loan object
+                Loan newLoan = new Loan(customer, foundEquipment, loanDate, returnDate);
 
+                //Mark equipment as unavailable
+                foundEquipment.MarkUnavailable();
+
+                //Add the new loan to the list of loans
                 loans.Add(newLoan);
 
-                Console.WriteLine("Loan created."); 
+                Console.WriteLine("Loan created.");
             }
             else
             {
-                Console.WriteLine("Error, equipment may not be available.");
+                Console.WriteLine("Error: Equipment is not available.");
             }
         }
 
         public List<Loan> FindLoan(string searchQuery)
         {
-            //Search for finding loan related to customers or equipment
+            //Search for loans related to customers or equipment
             return loans.Where(loan =>
                 loan.Customer.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
                 loan.Equipment.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
         }
+
         public void UpdateLoan(Loan loan, DateTime returnDate)
         {
-            //Function to allow updating date and time of loan
+            //Function to allow updating the return date of a loan
             loan.ReturnDate = returnDate;
             Console.WriteLine("Loan updated successfully.");
         }
@@ -57,7 +72,7 @@ namespace Assignment_2_loan_system
         public List<Equipment> FilterEquipment(string name)
         {
             //Filter equipment by equipment name
-            return equipment.Where(e => e.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
+            return availableEquipment.Where(e => e.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
         public List<Loan> GenerateOverdueReport()
@@ -68,10 +83,11 @@ namespace Assignment_2_loan_system
 
         public decimal CalculateFine(Loan loan)
         {
-            //Calculating the total fine the overdue loan has incurred
+            //Calculate the total fine the overdue loan has incurred
             TimeSpan overdueDuration = DateTime.Today - loan.ReturnDate;
             int overdueDays = overdueDuration.Days;
-            decimal fineAmount = overdueDays * 10; //£10 per day overdue
+            //£10 per day overdue
+            decimal fineAmount = overdueDays * 10; 
             return fineAmount;
         }
     }

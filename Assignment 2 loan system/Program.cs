@@ -11,8 +11,16 @@ namespace Application
     {
         static void Main(string[] args)
         {
-            //Load the LoanMangement class and create new instance
-            LoanManagement loanManagement = new LoanManagement();
+            //Create a list of initial equipment
+            List<Equipment> initialEquipmentList = new List<Equipment>
+            {
+                new Equipment("Ladder"),
+                new Equipment("Chainsaw"),
+                
+            };
+
+            //instance of LoanManagement with the initial equipment list
+            LoanManagement loanManagement = new LoanManagement(initialEquipmentList);
 
             //Main menu and welcome
             while (true)
@@ -62,20 +70,25 @@ namespace Application
             Console.Write("Enter customer name: ");
             string customerName = Console.ReadLine();
 
-            Console.Write("Enter equipment name: ");
+            //Display available equipment
+            Console.Write("Here's the equipment we offer: ");
+            foreach (Equipment equipment in loanManagement.AvailableEquipment)
+            {
+                Console.Write($"{equipment.Name}, ");
+            }
+            Console.WriteLine();
+
+            Console.Write("Select the equipment you wish to use: ");
             string equipmentName = Console.ReadLine();
 
             Console.Write("Enter loan duration (in days): ");
             int loanDuration = Convert.ToInt32(Console.ReadLine());
 
-            //Creating customer and equipment objects to record later
+            //Create customer object
             Customer customer = new Customer(customerName);
-            Equipment equipment = new Equipment(equipmentName);
 
-            //Creation and recording new loan
-            //Logging current date and time
-            DateTime loanDate = DateTime.Now; 
-            loanManagement.CreateLoan(customer, equipment, loanDate, loanDuration);
+            //Create loan
+            loanManagement.CreateLoan(customer, equipmentName, DateTime.Now, loanDuration);
 
             Console.WriteLine("Loan recorded successfully.");
         }
@@ -85,14 +98,14 @@ namespace Application
             //Search function
             Console.WriteLine("Find and Update Loans");
 
-            // Get search criteria from user
+            //Get search criteria from user
             Console.Write("Enter search query (customer name, equipment name, or loan date): ");
             string searchQuery = Console.ReadLine();
 
-            // Find loans based on search query
+            //Find loans based on search query
             List<Loan> foundLoans = loanManagement.FindLoan(searchQuery);
 
-            // Display search results
+            //Display search results
             if (foundLoans.Count > 0)
             {
                 Console.WriteLine("Found Loans:");
@@ -101,13 +114,13 @@ namespace Application
                     Console.WriteLine($"{i + 1}. {foundLoans[i]}");
                 }
 
-                // Prompt user to select a loan to update
+                //Prompt user to select a loan to update
                 Console.Write("Enter the number of the loan you want to update (or 0 to cancel): ");
                 int selectedIndex = Convert.ToInt32(Console.ReadLine());
 
                 if (selectedIndex > 0 && selectedIndex <= foundLoans.Count)
                 {
-                    // Update selected loan
+                    //Update selected loan
                     Loan selectedLoan = foundLoans[selectedIndex - 1];
                     Console.Write("Enter new return date (YYYY-MM-DD): ");
                     string newReturnDateString = Console.ReadLine();
@@ -137,11 +150,11 @@ namespace Application
             //Filter items/customer function
             Console.WriteLine("Filter Customers and Equipment");
 
-            // Get filter criteria from user
+            //Get filter criteria from user
             Console.Write("Enter name to filter by: ");
             string nameFilter = Console.ReadLine();
 
-            // Filter customers
+            //Filter customers
             List<Customer> filteredCustomers = loanManagement.FilterCustomers(nameFilter);
 
             // Display filtered customers
@@ -151,10 +164,10 @@ namespace Application
                 Console.WriteLine(customer);
             }
 
-            // Filter equipment
+            //Filter equipment
             List<Equipment> filteredEquipment = loanManagement.FilterEquipment(nameFilter);
 
-            // Display filtered equipment
+            //Display filtered equipment
             Console.WriteLine("Filtered Equipment:");
             foreach (Equipment equipment in filteredEquipment)
             {
@@ -167,19 +180,19 @@ namespace Application
             //Overdue loans and fines function
             Console.WriteLine("View Overdue Items and Fines");
 
-            // Get overdue loans from loan management
+            //Get overdue loans from loan management
             List<Loan> overdueLoans = loanManagement.GenerateOverdueReport();
 
-            // Check if there are any overdue loans
+            //Check if there are any overdue loans
             if (overdueLoans.Count > 0)
             {
                 Console.WriteLine("Overdue Items:");
                 foreach (Loan loan in overdueLoans)
                 {
-                    // Calculate fine for the overdue loan
+                    //Calculate fine for the overdue loan
                     decimal fine = loanManagement.CalculateFine(loan);
 
-                    // Display overdue loan details and fine
+                    //Display overdue loan details and fine
                     Console.WriteLine($"Customer: {loan.Customer.Name}, Equipment: {loan.Equipment.Name}, Return Date: {loan.ReturnDate}, Fine: £{fine}");
                 }
             }

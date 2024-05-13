@@ -18,16 +18,19 @@ namespace Assignment_2_loan_system
             this.ContactDetails = contactDetails;
         }
 
+        //method to update customer name
         public void UpdateName(string newName)
         {
             Name = newName;
         }
 
+        //Method to update contact details
         public void UpdateContactDetails(string newContactDetails)
         {
             ContactDetails = newContactDetails;
         }
 
+        //Converts to string to ensure better display to user
         public override string ToString()
         {
             return $"Name: {Name}, Contact Details: {ContactDetails}";
