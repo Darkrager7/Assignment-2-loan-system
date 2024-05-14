@@ -66,11 +66,21 @@ namespace Application
 
         static void CreateLoan(LoanManagement loanManagement)
         {
-            //Getting loan details from user input
-            Console.Write("Enter customer name: ");
-            string customerName = Console.ReadLine();
+            string customerName = null;
 
-            //Display available equipment
+            // Get a non-empty customer name from user input
+            while (string.IsNullOrEmpty(customerName))
+            {
+                Console.Write("Enter customer name: ");
+                customerName = Console.ReadLine();
+
+                if (string.IsNullOrEmpty(customerName))
+                {
+                    Console.WriteLine("Please enter a non-empty customer name.");
+                }
+            }
+
+            //Display equipment list
             Console.Write("Here's the equipment we offer: ");
             foreach (Equipment equipment in loanManagement.AvailableEquipment)
             {
@@ -78,11 +88,29 @@ namespace Application
             }
             Console.WriteLine();
 
+            //Offering equipment for use
             Console.Write("Select the equipment you wish to use: ");
             string equipmentName = Console.ReadLine();
 
+            //Asking the user for how long the loan is set out to be
             Console.Write("Enter loan duration (in days): ");
-            int loanDuration = Convert.ToInt32(Console.ReadLine());
+            //Defined loanDuration
+            int loanDuration = 0;
+
+            //Try and catch statement to avoid program breaking on extreme input
+            try
+            {
+                loanDuration = int.Parse(Console.ReadLine());
+
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error: Invalid input. Please enter a valid integer.");
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Error: Number is too large or too small.");
+            }
 
             //Create customer object
             Customer customer = new Customer(customerName);
@@ -92,6 +120,7 @@ namespace Application
 
             Console.WriteLine("Loan recorded successfully.");
         }
+
 
         static void FindAndUpdateLoans(LoanManagement loanManagement)
         {
@@ -157,11 +186,18 @@ namespace Application
             //Filter customers
             List<Customer> filteredCustomers = loanManagement.FilterCustomers(nameFilter);
 
-            // Display filtered customers
+            //Display filtered customers
             Console.WriteLine("Filtered Customers:");
-            foreach (Customer customer in filteredCustomers)
+            if (filteredCustomers.Any())
             {
-                Console.WriteLine(customer);
+                foreach (Customer customer in filteredCustomers)
+                {
+                    Console.WriteLine(customer);
+                }
+            }
+            else
+            {
+                Console.WriteLine("No customers found matching the search criteria.");
             }
 
             //Filter equipment
@@ -169,9 +205,16 @@ namespace Application
 
             //Display filtered equipment
             Console.WriteLine("Filtered Equipment:");
-            foreach (Equipment equipment in filteredEquipment)
+            if (filteredEquipment.Any())
             {
-                Console.WriteLine(equipment);
+                foreach (Equipment equipment in filteredEquipment)
+                {
+                    Console.WriteLine(equipment);
+                }
+            }
+            else
+            {
+                Console.WriteLine("No equipment found matching the search criteria.");
             }
         }
 
